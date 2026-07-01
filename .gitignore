@@ -22,6 +22,8 @@ desktop.ini
 
 # Editor / IDE
 .vscode/
+.kilo/
+.kilo
 .idea/
 *.swp
 *.swo

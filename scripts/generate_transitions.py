@@ -1,24 +1,16 @@
 import argparse
 import os
 import sys
-from PIL import Image
+
+try:
+    from PIL import Image
+except ImportError:
+    print("Required package not installed. Run:  pip install Pillow", file=sys.stderr)
+    sys.exit(1)
+
+from _utils import crop_cover_16_9, natural_sort_key
 
 TARGET_W, TARGET_H = 1280, 720
-
-def crop_cover_16_9(img):
-    """Crop-resize an image to 16:9 cover-fit (object-cover style)."""
-    img = img.convert("RGB")
-    img_ratio = img.width / img.height
-    target_ratio = TARGET_W / TARGET_H
-    if img_ratio > target_ratio:
-        new_width = int(target_ratio * img.height)
-        offset = (img.width - new_width) // 2
-        img = img.crop((offset, 0, offset + new_width, img.height))
-    else:
-        new_height = int(img.width / target_ratio)
-        offset = (img.height - new_height) // 2
-        img = img.crop((0, offset, img.width, offset + new_height))
-    return img.resize((TARGET_W, TARGET_H), Image.Resampling.LANCZOS)
 
 
 def main():
@@ -66,8 +58,9 @@ def main():
         sys.exit(1)
 
     kf_files = sorted(
-        f for f in os.listdir(kf_dir)
-        if os.path.splitext(f)[1].lower() in {".png", ".jpg", ".jpeg", ".webp"}
+        (f for f in os.listdir(kf_dir)
+         if os.path.splitext(f)[1].lower() in {".png", ".jpg", ".jpeg", ".webp"}),
+        key=natural_sort_key,
     )
     if len(kf_files) < 2:
         print(f"Error: at least 2 keyframe images are required; found {len(kf_files)} in '{kf_dir}'.", file=sys.stderr)
@@ -97,6 +90,8 @@ def main():
         end_img = keyframes[seg + 1]
         count = seg_frames + (1 if seg < remainder else 0)
         for j in range(count):
+            # When count == 1 the single frame is an unblended copy of start_img
+            # (t = 0 / 1 = 0, blend weight 0 → pure start_img).
             t = j / max(count - 1, 1)
             ease_t = t * t * (3.0 - 2.0 * t)
             blended = Image.blend(start_img, end_img, ease_t)

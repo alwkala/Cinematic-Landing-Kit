@@ -14,9 +14,15 @@ import argparse
 import os
 import sys
 
-import cv2
-import numpy as np
-from PIL import Image
+try:
+    import cv2
+    import numpy as np
+    from PIL import Image
+except ImportError as e:
+    print(f"Required package not installed. Run:  pip install opencv-python Pillow  ({e})", file=sys.stderr)
+    sys.exit(1)
+
+from _utils import crop_cover_16_9
 
 W, H = 1280, 720
 
@@ -32,20 +38,27 @@ def ensure_openh264_dll():
         os.environ["PATH"] = script_dir + os.pathsep + os.environ.get("PATH", "")
 
 
-def crop_cover_16_9(img):
-    """Crop-resize an image to 1280x720 (object-cover style)."""
-    img = img.convert("RGB")
-    img_ratio = img.width / img.height
-    target_ratio = W / H
-    if img_ratio > target_ratio:
-        new_width = int(target_ratio * img.height)
-        offset = (img.width - new_width) // 2
-        img = img.crop((offset, 0, offset + new_width, img.height))
-    else:
-        new_height = int(img.width / target_ratio)
-        offset = (img.height - new_height) // 2
-        img = img.crop((0, offset, img.width, offset + new_height))
-    return img.resize((W, H), Image.Resampling.LANCZOS)
+def _split_task_spec(spec):
+    """Split 'src:dest[:opts]' with Windows drive-letter awareness.
+
+    A single-alpha + ':' at any point in the walk is treated as a drive letter
+    prefix (e.g.  C:\\path) rather than a field separator.  All other colons
+    are field separators.
+    """
+    parts = []
+    current = ""
+    for ch in spec:
+        if ch == ":":
+            if len(current) == 1 and current[0].isalpha():
+                # Drive-letter colon — keep it in the buffer.
+                current += ch
+            else:
+                parts.append(current)
+                current = ""
+        else:
+            current += ch
+    parts.append(current)
+    return parts
 
 
 def create_dolly_zoom_video(img_path, dest_path, duration=3, fps=24, zoom_range=(1.0, 1.08)):
@@ -53,7 +66,7 @@ def create_dolly_zoom_video(img_path, dest_path, duration=3, fps=24, zoom_range=
         print(f"[error] Source image not found: {img_path}", file=sys.stderr)
         return False
 
-    img = crop_cover_16_9(Image.open(img_path))
+    img = crop_cover_16_9(Image.open(img_path), W, H)
     fourcc = cv2.VideoWriter_fourcc(*"avc1")
     os.makedirs(os.path.dirname(dest_path) or ".", exist_ok=True)
     out = cv2.VideoWriter(dest_path, fourcc, fps, (W, H))
@@ -106,7 +119,7 @@ def main():
     default_zoom = (zoom_start, zoom_end)
 
     for spec in args.tasks:
-        parts = spec.split(":")
+        parts = _split_task_spec(spec)
         if len(parts) < 2:
             print(f"[skip] '{spec}' — expected  src:dest[:dur=z,zoom=a:b]", file=sys.stderr)
             continue
