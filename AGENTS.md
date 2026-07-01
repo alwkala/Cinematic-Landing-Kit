@@ -13,16 +13,18 @@ The product "film" is a **JPG frame-sequence drawn on `<canvas>`**, scrubbed by 
 2. **Choose a layout** from `templates/layouts/` — see the decision table there. Pick based on product type:
    - `fullbleed.html` — long scroll film, aura+motes hero (transformation stories: perfume, food, watches)
    - `editorial.html` — split-screen hero, shorter film, two-column sections (specs-heavy: furniture, auto, skincare)
+   - `spatial.html` — establishing-shot hero, walkthrough film, experience/location sections (real estate, architecture, luxury travel, hospitality)
+   - `interface.html` — device mockup hero, UI-flow film, feature/workflow sections (SaaS, apps, digital platforms)
    - `minimal.html` — centered hero, no canvas film, section-based (fast/lightweight: digital products, books)
 3. **Scaffold**: copy the chosen template to root as `index.html`, fill `{{PLACEHOLDERS}}`, wire sections/assets. The engine is correct — wire it, don't rewrite it.
 4. **Write the prompt list** from `templates/MEDIA-PROMPTS.template.md` (numbered, boundary-matched, identity + modesty clauses). Skip the film-section prompts if building from `minimal.html`.
 5. **Generate assets** (see `memory/06-media-pipeline.md`): Qwen Image keyframes in parallel → Wan boundary-matched video clips (after keyframes verified) → extract frames → transparent hero cutout via `rembg`.
-6. **Sync `FRAME_COUNT`** in `index.html` to the actual extracted frame count (4 clips × 24 frames − 3 duplicates = 93 is typical). Only applies to `fullbleed` and `editorial` templates.
+6. **Sync `FRAME_COUNT`** in `index.html` to the actual extracted frame count (4 clips × 24 frames − 3 duplicates = 93 is typical). Applies to `fullbleed`, `editorial`, `spatial`, and `interface` templates (not `minimal`).
 7. **Preview locally & verify** (see "Preview & verification" below). Web-optimize heavy assets via `scripts/optimize_assets.py`.
 
 ## Non-negotiables
 
-- **Cinematic hero**, not a static image + fade. Transparent PNG cutout (no `mix-blend-mode` — it breaks under GSAP `transform`).
+- **Cinematic hero**, not a static image + fade. For product/brand layouts (`fullbleed`, `editorial`, `minimal`): transparent PNG cutout (no `mix-blend-mode` — it breaks under GSAP `transform`). For `spatial`: full-bleed establishing shot. For `interface`: device mockup frame.
 - **Boundary-matched clips**: clip N end-frame == clip N+1 start-frame. Never cross-dissolve two stills.
 - **Ambient `#ambient` layer** shifts color per section via GSAP tween.
 - **Header** hides on scroll-down (`.hidden`), returns on scroll-up. Never removed.
@@ -68,3 +70,4 @@ The frame extraction recipe (no ffmpeg needed) is in `memory/06-media-pipeline.m
 - `memory/06-media-pipeline.md` — Qwen Image + Wan API patterns, frame extraction code, parallel generation
 - `memory/08-preview-and-env-gotchas.md` — all the env quirks above, with full explanations
 - `memory/09-quality-bar.md` — the auto-reject checklist (what gets thrown out)
+- `memory/10-use-cases.md` — use-case routing: which layout, which sections, which media prompts for all 15 use cases

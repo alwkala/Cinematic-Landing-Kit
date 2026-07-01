@@ -36,7 +36,7 @@ working `index.html` on the first attempt.
 
 ```
 ├── AGENTS.md                         ← entry point any agent reads automatically
-├── memory/                           ← 9 reference files (the "DNA" of the look)
+├── memory/                           ← 10 reference files (the "DNA" of the look)
 │   ├── 01-build-playbook.md             page structure, Lenis + GSAP motion stack
 │   ├── 02-scroll-film-canvas.md         ★ canvas frame-sequence technique
 │   ├── 03-seamless-transitions.md       boundary-matched video clips
@@ -45,14 +45,17 @@ working `index.html` on the first attempt.
 │   ├── 06-media-pipeline.md             Qwen Image + Wan API, frame extraction
 │   ├── 07-modesty-and-identity.md       non-negotiable constraints on people/products
 │   ├── 08-preview-and-env-gotchas.md    hidden-tab quirks, eval-based verification
-│   └── 09-quality-bar.md                what gets auto-rejected
+│   ├── 09-quality-bar.md                what gets auto-rejected
+│   └── 10-use-cases.md                  ★ use-case routing: 15 use cases → layout + beats + media
 ├── templates/
 │   ├── layouts/                       ← choose one layout variant per project
-│   │   ├── fullbleed.html                long scroll film + aura hero (transformation stories)
-│   │   ├── editorial.html                split-screen hero + shorter film (specs-heavy)
-│   │   ├── minimal.html                  centered hero, no canvas film (lightweight)
+│   │   ├── fullbleed.html                long scroll film + aura hero (1,2,3,7,9,11,12,14,15)
+│   │   ├── editorial.html                split-screen hero + shorter film (2,8,13)
+│   │   ├── spatial.html                  establishing-shot hero + walkthrough film (4,10)
+│   │   ├── interface.html                device mockup hero + UI-flow film (6)
+│   │   ├── minimal.html                  centered hero, no canvas film (5)
 │   │   └── README.md                     decision tree: which template for which product
-│   ├── MEDIA-PROMPTS.template.md      ← numbered prompt list template
+│   ├── MEDIA-PROMPTS.template.md      ← numbered prompt list + per-use-case beat variants
 │   └── launch.json                    ← preview-server config
 └── scripts/                          ← Python helpers (no ffmpeg/jq required)
     ├── remove_backgrounds.py            rembg → transparent cutouts
@@ -104,6 +107,24 @@ supports image-to-image and image-to-video can substitute.
 
 ---
 
+## Layouts & supported use cases
+
+Five layout variants cover 15 distinct use cases. The agent reads the use-case
+routing guide (`memory/10-use-cases.md`) to pick the right layout automatically.
+
+| Layout | Hero treatment | Film | Use cases |
+|--------|---------------|------|-----------|
+| `fullbleed` | Product cutout + aura + motes | Long transformation (640vh) | Product launches, high-ticket sales, rebrands, automotive, fashion, causes, artisan, limited drops |
+| `editorial` | Split-screen (image + copy) | Shorter film (420vh) | Brand stories, events/conferences, founder pages |
+| `spatial` | Full-bleed establishing shot | Spatial walkthrough (500vh) | Real estate, architecture, luxury travel, hospitality |
+| `interface` | Device mockup (CSS frame) | UI flow film (420vh) | SaaS launches, app launches, digital platforms |
+| `minimal` | Centered cutout, no aura | No film | Personal brands, creators, digital products |
+
+**Fit test:** one clear subject + transformation arc + user in inspire mode → cinematic kit.
+Multi-product catalogs, spec comparison pages, and A/B-tested funnels → standard landing page.
+
+---
+
 ## What the agent knows before it starts
 
 These are the hard-won lessons encoded in `memory/` — the things agents
@@ -121,6 +142,9 @@ typically get wrong on the first attempt without guidance:
 - **Arabic typography:** El Messiri (headings) + Tajawal (body). Never Amiri.
 - Modesty is mandatory for any human subject. Product identity is preserved
   exactly across all generated assets.
+- Layout-specific heroes: `fullbleed`/`editorial`/`minimal` use a transparent
+  PNG cutout. `spatial` uses a full-bleed establishing shot. `interface` uses
+  a CSS device mockup frame — no cutout needed for either.
 
 ---
 
@@ -134,10 +158,16 @@ typically get wrong on the first attempt without guidance:
   │  AI agent reads      │
   │  AGENTS.md           │
   │  + memory/ files     │
+  │  (inc. 10-use-cases) │
   └─────────┬───────────┘
             │
             ▼
-  templates/layouts/*.html  ←  choose layout, fill placeholders
+  pick layout: fullbleed | editorial
+               spatial   | interface
+               minimal
+            │
+            ▼
+  templates/layouts/*.html  ←  scaffold, fill placeholders
             │
             ▼
   Qwen Image keyframes  →  Wan video clips
@@ -148,7 +178,7 @@ typically get wrong on the first attempt without guidance:
         → assets/seq/f000.jpg … fNNN.jpg
                    │
                    ▼
-        rembg → transparent hero cutout
+        rembg → hero cutout (not needed for spatial/interface)
                    │
                    ▼
              index.html  (served via npx serve)
