@@ -1,28 +1,47 @@
+import argparse
 import os
+import sys
 from PIL import Image
 
-brand_dir = 'brand-images'
-files = [
-    'papagendo (1).png',
-    'papagendo (10).png',
-    'papagendo (6).png',
-    'PapaGendo-logo.png'
-]
-
-print("Alpha Channel Check:")
-for file in files:
-    path = os.path.join(brand_dir, file)
+def check_alpha(path):
     if not os.path.exists(path):
-        print(f"- {file} does not exist")
-        continue
+        print(f"- {path}: file not found")
+        return
     try:
         with Image.open(path) as img:
             if img.mode == 'RGBA':
-                # Check if there is any transparency (alpha < 255)
                 alpha = img.split()[3]
                 extrema = alpha.getextrema()
-                print(f"- {file}: RGBA. Alpha range: {extrema}. Has transparency: {extrema[0] < 255}")
+                has_transparency = extrema[0] < 255
+                print(f"- {path}: RGBA  alpha_range={extrema}  transparent={has_transparency}")
             else:
-                print(f"- {file}: {img.mode}. No alpha channel.")
+                print(f"- {path}: {img.mode}  no alpha channel")
     except Exception as e:
-        print(f"- {file}: Error {e}")
+        print(f"- {path}: ERROR  {e}")
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Check whether images have an alpha (transparency) channel."
+    )
+    parser.add_argument(
+        "paths",
+        nargs="*",
+        help="One or more image file paths. If a path is a directory, all PNG/WEBP files inside it are checked.",
+    )
+    args = parser.parse_args()
+
+    if not args.paths:
+        parser.print_help()
+        sys.exit(0)
+
+    print("Alpha Channel Check:")
+    for p in args.paths:
+        if os.path.isdir(p):
+            for f in sorted(os.listdir(p)):
+                if f.lower().endswith((".png", ".webp", ".tga")):
+                    check_alpha(os.path.join(p, f))
+        else:
+            check_alpha(p)
+
+if __name__ == "__main__":
+    main()

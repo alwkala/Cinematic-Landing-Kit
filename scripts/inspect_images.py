@@ -1,14 +1,43 @@
+import argparse
 import os
+import sys
 from PIL import Image
 
-brand_dir = 'brand-images'
-files = [f for f in os.listdir(brand_dir) if f.endswith('.png') or f.endswith('.jpg')]
+IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".tiff", ".bmp", ".tga"}
 
-print("Image Inspection:")
-for file in files:
-    path = os.path.join(brand_dir, file)
+def inspect(path):
     try:
         with Image.open(path) as img:
-            print(f"- {file}: {img.size} (Format: {img.format}, Mode: {img.mode})")
+            print(f"- {path}:  size={img.size}  format={img.format}  mode={img.mode}")
     except Exception as e:
-        print(f"- {file}: Error {e}")
+        print(f"- {path}: ERROR  {e}")
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Print size, format, and colour-mode of image files."
+    )
+    parser.add_argument(
+        "paths",
+        nargs="*",
+        help=(
+            "One or more image file paths or directories. "
+            "Directories are scanned for common image extensions."
+        ),
+    )
+    args = parser.parse_args()
+
+    if not args.paths:
+        parser.print_help()
+        sys.exit(0)
+
+    print("Image Inspection:")
+    for p in args.paths:
+        if os.path.isdir(p):
+            for f in sorted(os.listdir(p)):
+                if os.path.splitext(f)[1].lower() in IMAGE_EXTENSIONS:
+                    inspect(os.path.join(p, f))
+        else:
+            inspect(p)
+
+if __name__ == "__main__":
+    main()

@@ -1,28 +1,62 @@
+import argparse
 import os
+import sys
 from PIL import Image
 
-os.makedirs("assets", exist_ok=True)
+PNG_EXTS = {".png", ".webp", ".tga", ".bmp", ".tiff"}
 
-conversions = [
-    ("assets/papagendo (7).png", "assets/product-hero.jpg"),
-    ("assets/papagendo (8).png", "assets/edition-1.jpg"),
-    ("assets/papagendo (9).png", "assets/edition-2.jpg"),
-    ("assets/papagendo (10).png", "assets/origin.jpg"), # fallback background
-    ("assets/papagendo (6).png", "assets/ritual.jpg") # fallback lifestyle/ritual
-]
-
-print("Starting PNG to JPG conversions...")
-for src, dest in conversions:
+def convert_to_jpg(src, dest, quality=87):
     if not os.path.exists(src):
-        print(f"Source file {src} not found!")
-        continue
+        print(f"[skip] {src} not found")
+        return
     try:
-        print(f"Converting {src} -> {dest}...")
         img = Image.open(src)
-        # Convert to RGB mode before saving as JPEG
-        rgb_img = img.convert('RGB')
-        # Save as optimized JPEG
-        rgb_img.save(dest, 'JPEG', quality=87)
-        print(f"Saved {dest}")
+        rgb_img = img.convert("RGB")
+        os.makedirs(os.path.dirname(dest) or ".", exist_ok=True)
+        rgb_img.save(dest, "JPEG", quality=quality)
+        print(f"[ok]   {src} -> {dest}  (q={quality})")
     except Exception as e:
-        print(f"Error converting {src}: {e}")
+        print(f"[error] {src}: {e}")
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Convert PNG/WEBP images to optimised JPEG. "
+                    "Accepts explicit src:dest pairs or an input/output directory pair.",
+    )
+    parser.add_argument(
+        "pairs",
+        nargs="*",
+        help="src:dest pairs  e.g.  assets/hero.png:assets/hero.jpg",
+    )
+    parser.add_argument(
+        "--input-dir",
+        help="Scan a directory for PNG/WEBP files (alternative to positional pairs)",
+    )
+    parser.add_argument("--output-dir", help="Directory for converted JPEGs (default: same as input)")
+    parser.add_argument("--quality", "-q", type=int, default=87, help="JPEG quality 1-100 (default: 87)")
+    args = parser.parse_args()
+
+    if args.input_dir and args.pairs:
+        parser.error("Use either --input-dir OR positional pairs, not both.")
+
+    if args.input_dir:
+        out_dir = args.output_dir or args.input_dir
+        os.makedirs(out_dir, exist_ok=True)
+        for f in sorted(os.listdir(args.input_dir)):
+            if os.path.splitext(f)[1].lower() in PNG_EXTS:
+                src = os.path.join(args.input_dir, f)
+                dest = os.path.join(out_dir, os.path.splitext(f)[0] + ".jpg")
+                convert_to_jpg(src, dest, args.quality)
+    elif args.pairs:
+        for pair in args.pairs:
+            if ":" not in pair:
+                print(f"[skip] '{pair}' — expected format  src:dest", file=sys.stderr)
+                continue
+            src, dest = pair.split(":", 1)
+            convert_to_jpg(src.strip(), dest.strip(), args.quality)
+    else:
+        parser.print_help()
+        sys.exit(0)
+
+if __name__ == "__main__":
+    main()

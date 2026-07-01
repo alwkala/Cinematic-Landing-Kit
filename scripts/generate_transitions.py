@@ -1,102 +1,110 @@
+import argparse
 import os
-from PIL import Image, ImageChops
+import sys
+from PIL import Image
 
-# Paths to the generated images
-brain_dir = r"C:\Users\waels\.gemini\antigravity-ide\brain\fecac563-cfae-412f-a406-f21326b0b459"
-k_files = [
-    os.path.join(brain_dir, "k1_1782877929407.png"),
-    os.path.join(brain_dir, "k2_1782877945610.png"),
-    os.path.join(brain_dir, "k3_1782877979057.png"),
-    os.path.join(brain_dir, "k4_1782878016164.png"),
-    os.path.join(brain_dir, "k5_1782878093890.png")
-]
+TARGET_W, TARGET_H = 1280, 720
 
-# Ensure seq-src exists and save the clean keyframes there
-os.makedirs("assets/seq-src", exist_ok=True)
-os.makedirs("assets/seq", exist_ok=True)
-
-# Target size for 16:9 canvas frames
-W, H = 1280, 720
-
-keyframes = []
-for i, path in enumerate(k_files):
-    if not os.path.exists(path):
-        print(f"Warning: {path} not found!")
-        continue
-    img = Image.open(path).convert("RGB")
-    # Crop/resize to exactly 1280x720 (16:9) object-cover style
+def crop_cover_16_9(img):
+    """Crop-resize an image to 16:9 cover-fit (object-cover style)."""
+    img = img.convert("RGB")
     img_ratio = img.width / img.height
-    target_ratio = W / H
+    target_ratio = TARGET_W / TARGET_H
     if img_ratio > target_ratio:
-        # Image is wider than 16:9 -> crop sides
         new_width = int(target_ratio * img.height)
         offset = (img.width - new_width) // 2
         img = img.crop((offset, 0, offset + new_width, img.height))
     else:
-        # Image is taller than 16:9 -> crop top/bottom
         new_height = int(img.width / target_ratio)
         offset = (img.height - new_height) // 2
         img = img.crop((0, offset, img.width, offset + new_height))
-    
-    img = img.resize((W, H), Image.Resampling.LANCZOS)
-    keyframes.append(img)
-    
-    # Save the source keyframe in assets/seq-src
-    dest_path = f"assets/seq-src/k{i+1}.jpg"
-    img.save(dest_path, "JPEG", quality=90)
-    print(f"Saved keyframe: {dest_path}")
+    return img.resize((TARGET_W, TARGET_H), Image.Resampling.LANCZOS)
 
-# Now generate the transitions
-# We want 93 frames total.
-# 4 clips, transitions between:
-# K1 -> K2 (24 frames: f000 to f023)
-# K2 -> K3 (23 frames: f023 to f045, f023 is K2, f045 is K3) -> wait, let's write it carefully:
-# Let's map each frame index to a progress ratio between keyframes
-total_frames = 93
-indices_per_transition = 23 # 93 frames total = 24 + 23 + 23 + 23
 
-# We will generate frames f000 to f092
-# Frame i from 0 to 92:
-# which segment does it belong to?
-# 0 to 23 -> segment 0 (K1 to K2)
-# 23 to 46 -> segment 1 (K2 to K3)
-# 46 to 69 -> segment 2 (K3 to K4)
-# 69 to 92 -> segment 3 (K4 to K5)
+def main():
+    parser = argparse.ArgumentParser(
+        description=(
+            "Generate a JPEG frame-sequence from N keyframe images using eased cross-blends. "
+            "Output frames are named f000.jpg, f001.jpg, … and are suitable for scrubbing on a <canvas>."
+        ),
+    )
+    parser.add_argument(
+        "--keyframes-dir",
+        "-k",
+        required=True,
+        help="Directory containing numbered keyframe images (k1.png k2.png … or any sorted order).",
+    )
+    parser.add_argument(
+        "--output-dir",
+        "-o",
+        default="assets/seq",
+        help="Directory to write the output frame sequence (default: assets/seq).",
+    )
+    parser.add_argument(
+        "--src-dir",
+        help="Optional directory to save the normalised 1280x720 keyframes (default: <output-dir>/../seq-src).",
+    )
+    parser.add_argument(
+        "--total-frames",
+        "-f",
+        type=int,
+        default=93,
+        help="Total number of output frames (default: 93).",
+    )
+    parser.add_argument(
+        "--quality",
+        "-q",
+        type=int,
+        default=80,
+        help="JPEG quality for output frames (default: 80).",
+    )
+    args = parser.parse_args()
 
-for idx in range(total_frames):
-    if idx <= 23:
-        # Segment 0 (K1 to K2)
-        start_img = keyframes[0]
-        end_img = keyframes[1]
-        t = idx / 23.0
-    elif idx <= 46:
-        # Segment 1 (K2 to K3)
-        start_img = keyframes[1]
-        end_img = keyframes[2]
-        t = (idx - 23) / 23.0
-    elif idx <= 69:
-        # Segment 2 (K3 to K4)
-        start_img = keyframes[2]
-        end_img = keyframes[3]
-        t = (idx - 46) / 23.0
-    else:
-        # Segment 3 (K4 to K5)
-        start_img = keyframes[3]
-        end_img = keyframes[4]
-        t = (idx - 69) / 23.0
-    
-    # Linear interpolation/blend with a gentle ease-in-out curve
-    # ease_t = 3 * t^2 - 2 * t^3
-    ease_t = t * t * (3.0 - 2.0 * t)
-    
-    # We can also do a gentle zoom/pan
-    # For segment 0: zoom in end_img slightly
-    # For segment 3: zoom out start_img slightly
-    # Let's keep it clean: simple blend
-    blended = Image.blend(start_img, end_img, ease_t)
-    
-    # Save frame
-    frame_path = f"assets/seq/f{idx:03d}.jpg"
-    blended.save(frame_path, "JPEG", quality=80)
+    kf_dir = args.keyframes_dir
+    if not os.path.isdir(kf_dir):
+        print(f"Error: keyframes directory '{kf_dir}' does not exist.", file=sys.stderr)
+        sys.exit(1)
 
-print(f"Generated {total_frames} transition frames successfully in assets/seq/")
+    kf_files = sorted(
+        f for f in os.listdir(kf_dir)
+        if os.path.splitext(f)[1].lower() in {".png", ".jpg", ".jpeg", ".webp"}
+    )
+    if len(kf_files) < 2:
+        print(f"Error: at least 2 keyframe images are required; found {len(kf_files)} in '{kf_dir}'.", file=sys.stderr)
+        sys.exit(1)
+
+    os.makedirs(args.output_dir, exist_ok=True)
+    src_dir = args.src_dir or os.path.join(os.path.dirname(args.output_dir), "seq-src")
+    os.makedirs(src_dir, exist_ok=True)
+
+    keyframes = []
+    for i, fname in enumerate(kf_files):
+        path = os.path.join(kf_dir, fname)
+        img = crop_cover_16_9(Image.open(path))
+        keyframes.append(img)
+        dest = os.path.join(src_dir, f"k{i + 1}.jpg")
+        img.save(dest, "JPEG", quality=90)
+        print(f"[keyframe] {path} -> {dest}")
+
+    n_segments = len(keyframes) - 1
+    total_frames = args.total_frames
+    seg_frames = total_frames // n_segments
+    remainder = total_frames - seg_frames * n_segments
+
+    frame_idx = 0
+    for seg in range(n_segments):
+        start_img = keyframes[seg]
+        end_img = keyframes[seg + 1]
+        count = seg_frames + (1 if seg < remainder else 0)
+        for j in range(count):
+            t = j / max(count - 1, 1)
+            ease_t = t * t * (3.0 - 2.0 * t)
+            blended = Image.blend(start_img, end_img, ease_t)
+            dest = os.path.join(args.output_dir, f"f{frame_idx:03d}.jpg")
+            blended.save(dest, "JPEG", quality=args.quality)
+            frame_idx += 1
+
+    print(f"[done] Generated {frame_idx} frames in {args.output_dir}/")
+
+if __name__ == "__main__":
+    main()
