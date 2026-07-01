@@ -9,6 +9,8 @@ except ImportError:
     print("Required packages not installed. Run:  pip install rembg pillow", file=sys.stderr)
     sys.exit(1)
 
+from _utils import split_spec
+
 def remove_bg(src, dest):
     if not os.path.exists(src):
         print(f"[skip] {src} not found")
@@ -46,7 +48,8 @@ def main():
 
     for spec in args.inputs:
         if ":" in spec:
-            src, dest = spec.split(":", 1)
+            parts = split_spec(spec)
+            src, dest = parts[0], parts[1] if len(parts) > 1 else parts[0]
         elif args.output:
             src, dest = spec, args.output
         else:

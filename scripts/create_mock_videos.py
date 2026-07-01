@@ -22,7 +22,7 @@ except ImportError as e:
     print(f"Required package not installed. Run:  pip install opencv-python Pillow  ({e})", file=sys.stderr)
     sys.exit(1)
 
-from _utils import crop_cover_16_9
+from _utils import crop_cover_16_9, split_spec
 
 W, H = 1280, 720
 
@@ -37,28 +37,6 @@ def ensure_openh264_dll():
     if os.path.exists(dll_path):
         os.environ["PATH"] = script_dir + os.pathsep + os.environ.get("PATH", "")
 
-
-def _split_task_spec(spec):
-    """Split 'src:dest[:opts]' with Windows drive-letter awareness.
-
-    A single-alpha + ':' at any point in the walk is treated as a drive letter
-    prefix (e.g.  C:\\path) rather than a field separator.  All other colons
-    are field separators.
-    """
-    parts = []
-    current = ""
-    for ch in spec:
-        if ch == ":":
-            if len(current) == 1 and current[0].isalpha():
-                # Drive-letter colon — keep it in the buffer.
-                current += ch
-            else:
-                parts.append(current)
-                current = ""
-        else:
-            current += ch
-    parts.append(current)
-    return parts
 
 
 def create_dolly_zoom_video(img_path, dest_path, duration=3, fps=24, zoom_range=(1.0, 1.08)):
@@ -119,7 +97,7 @@ def main():
     default_zoom = (zoom_start, zoom_end)
 
     for spec in args.tasks:
-        parts = _split_task_spec(spec)
+        parts = split_spec(spec)
         if len(parts) < 2:
             print(f"[skip] '{spec}' — expected  src:dest[:dur=z,zoom=a:b]", file=sys.stderr)
             continue

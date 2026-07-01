@@ -1,7 +1,12 @@
 import argparse
 import os
 import sys
-from PIL import Image
+
+try:
+    from PIL import Image
+except ImportError:
+    print("Pillow is required. Run:  pip install Pillow", file=sys.stderr)
+    sys.exit(1)
 
 def check_alpha(path):
     if not os.path.exists(path):

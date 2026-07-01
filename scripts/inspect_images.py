@@ -1,7 +1,12 @@
 import argparse
 import os
 import sys
-from PIL import Image
+
+try:
+    from PIL import Image
+except ImportError:
+    print("Pillow is required. Run:  pip install Pillow", file=sys.stderr)
+    sys.exit(1)
 
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".tiff", ".bmp", ".tga"}
 
