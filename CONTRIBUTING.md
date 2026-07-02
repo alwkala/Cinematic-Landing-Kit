@@ -76,7 +76,7 @@ If you built a layout variant that solves a use case not covered by the existing
 - Update `AGENTS.md` layout decision table
 - Update `README.md` layouts section
 
-### 3. Media Pipeline Improvements (`scripts/` or `memory/06-media-pipeline.md`)
+### 3. Media Pipeline Improvements (`scripts/` or `memory/06-media-pipeline*.md`)
 
 If you found a better way to:
 - Extract frames (faster, higher quality)
@@ -84,7 +84,7 @@ If you found a better way to:
 - Remove backgrounds (cleaner edges)
 - Optimize assets (smaller files, same quality)
 
-Document the recipe in `memory/06-media-pipeline.md` and/or improve the Python scripts in `scripts/`.
+Document the recipe in the appropriate `memory/06-media-pipeline-*.md` file and/or improve the Python scripts in `scripts/`.
 
 ### 4. Use-Case Additions (`memory/10-use-cases.md`)
 
@@ -110,8 +110,7 @@ cd cinematic-landing-kit
 # Install Python dependencies for scripts
 pip install rembg Pillow opencv-python dashscope
 
-# Preview any layout locally
-npx -y serve -l 8123 .
+python -m http.server 8123
 ```
 
 Open `http://localhost:8123` in a **visible** (not backgrounded) browser tab. Hidden tabs pause `requestAnimationFrame`, which freezes GSAP tweens and makes the page look broken.
@@ -139,7 +138,7 @@ Open `http://localhost:8123` in a **visible** (not backgrounded) browser tab. Hi
 - **Headings**: sentence case, no trailing periods
 - **Code**: use fenced code blocks with language identifiers
 - **Filenames**: reference them with backticks, relative to project root
-- **Memory files**: number sequentially, use descriptive slug after number (`06-media-pipeline.md`)
+- **Memory files**: number sequentially, use descriptive slug after number (e.g., `06-media-pipeline-qwen.md`)
 
 ### HTML Templates
 

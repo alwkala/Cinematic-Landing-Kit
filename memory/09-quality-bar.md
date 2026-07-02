@@ -8,7 +8,7 @@ The reference is **TV-commercial / Apple × Cartier / Hermès** dark-or-light lu
 - **Typography:** clean over calligraphic for luxury. For Arabic: **El Messiri** (headings) + **Tajawal** (body); avoid **Amiri** for big display. High contrast with the background.
 - **Captions over film:** small, high-contrast, **off-center (right in RTL)** so they don't fight the centered subject. The opening centered title is fine; subsequent center text is not.
 - **Nav:** a beautiful header WITH the product logo that **hides on scroll-down, returns on scroll-up** (removing it entirely is wrong).
-- Generate **real assets** (images AND video) via Nano Banana (`generate_image`) — don't lean on placeholders or reuse rejected assets.
+- Generate **real assets** (images AND video) via your chosen media provider — don't lean on placeholders or reuse rejected assets.
 
 ## Auto-rejects — never do these
 - Janky/choppy scroll, frame loss → caused by scrubbing `video.currentTime`. Use a canvas frame sequence ([02](02-scroll-film-canvas.md)).

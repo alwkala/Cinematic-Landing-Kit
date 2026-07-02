@@ -1,67 +1,46 @@
-# 06 · Media Pipeline (Qwen Image + Wan)
+# 06 · Media Pipeline Router & Selection Guide
 
-How to generate every asset reliably using **Qwen Image** for stills and **Wan** for video clips. Use the DashScope API, Alibaba Cloud Bailian platform, or any equivalent Qwen Image / Wan endpoint.
+How to select, setup, and run the media generation pipeline. Choose your provider from the three options below depending on your available models and interface (API, CLI, or built-in tools).
 
-## Image generation — Qwen Image
-Qwen Image models (qwen-image, qwen-image-edit, etc.) generate high-quality still images from text prompts and optional reference images.
+## Provider selection matrix
 
-### Calling pattern (DashScope API)
+| Feature | Qwen Image + Wan | Higgsfield CLI | Nano Banana |
+| :--- | :--- | :--- | :--- |
+| **Best For** | Parallel, API-driven workflows | CLI-driven workflows, high-res | Native built-in tool execution |
+| **Still Images** | Qwen Image (DashScope API) | `nano_banana_2` / `gpt_image_2` | `generate_image` tool |
+| **Video Clips** | Wan i2v (DashScope API) | `seedance_2_0` i2v | External / separate tool |
+| **BG Removal** | `rembg` (Python) | `image_background_remover` | `rembg` (Python) |
+| **Complexity** | Medium (needs API key) | High (requires CLI installation) | Low (built-in tool) |
+| **Reference File** | [06-media-pipeline-qwen.md](06-media-pipeline-qwen.md) | [06-media-pipeline-higgsfield.md](06-media-pipeline-higgsfield.md) | [06-media-pipeline-nanobanana.md](06-media-pipeline-nanobanana.md) |
+
+## Decision Tree
+
+1. **Do you want native execution within the AI assistant workspace without installing external dependencies or APIs?**
+   - Use **Nano Banana** ([06-media-pipeline-nanobanana.md](06-media-pipeline-nanobanana.md)).
+2. **Do you have the `higgsfield` CLI installed and authenticated?**
+   - Use **Higgsfield CLI** ([06-media-pipeline-higgsfield.md](06-media-pipeline-higgsfield.md)).
+3. **Do you have DashScope API credentials and the `dashscope` python package installed?**
+   - Use **Qwen/Wan** ([06-media-pipeline-qwen.md](06-media-pipeline-qwen.md)).
+
+---
+
+## Shared Pipeline Procedures
+
+Regardless of the provider chosen, the following background removal, frame extraction, and optimization workflows must be executed.
+
+### 1. Background removal / transparent cutouts
+For the floating product hero cutout (where `mix-blend-mode` is prohibited), run **Python `rembg` + `Pillow`** to generate a clean alpha-channel PNG.
 ```python
-import dashscope
-from dashscope import ImageSynthesis
-
-rsp = dashscope.ImageSynthesis.call(
-    model="qwen-image",  # or your preferred Qwen Image variant
-    prompt="detailed description of the desired image...",
-    negative_prompt="text, watermark, extra elements, deformed",
-    n=1,
-    size="1024*1024",
-)
-# Save the returned image URL/content to assets/
+from rembg import remove
+from PIL import Image
+img = Image.open("assets/product-hero.jpg")
+out = remove(img)
+out.save("assets/product-cut.png")
 ```
+This is far more reliable than prompting for transparency. Works on any generated or reference image.
 
-### With reference images (image-to-image / variation)
-Pass reference images to maintain product identity. Most Qwen Image endpoints accept a `reference_images` or `image_urls` parameter — check your specific model's API docs. State explicitly: *"keep the exact product identity / emblem / calligraphy unchanged."*
-
-## Video generation — Wan
-Wan (Wan 2.1 / Wan 14B) generates video clips from start/end images or text prompts. Use it for the boundary-matched clips that become the scroll-film source.
-
-### Calling pattern (DashScope API)
-```python
-import dashscope
-from dashscope import VideoSynthesis
-
-rsp = dashscope.VideoSynthesis.call(
-    model="wanx2.1-i2v-turbo",  # or your preferred Wan variant
-    prompt="slow cinematic orbit, no cuts, no flicker, locked camera",
-    image_url="https://.../k1.jpg",     # start frame
-    negative_prompt="fast motion, cuts, flicker, text, watermark",
-)
-# Save the returned video URL/content to assets/
-```
-
-## Generation strategies
-- **Identity-preserving product shots** (logo / calligraphy / shape must stay identical) → use Qwen Image with reference images and describe the desired scene. State explicitly: *"keep the exact product identity / emblem / calligraphy unchanged."* This is your workhorse for anything with the product in it. Also does re-skins (color/flavor variants) while keeping the same logo/text.
-- **Standalone scenes/environments** with NO product identity to preserve (landscapes, backdrops) → prompt-only Qwen Image, no reference needed. Describe the environment in detail.
-- **Background removal / transparent cutouts** (for the hero / floating product) → use **Python `rembg` + `Pillow`** on any product shot to get a clean alpha-channel PNG:
-  ```python
-  from rembg import remove
-  from PIL import Image
-  img = Image.open("assets/product-hero.jpg")
-  out = remove(img)
-  out.save("assets/product-cut.png")
-  ```
-  This is far more reliable than prompting for transparency. Works on any generated or reference image.
-- **Boundary-matched video clips** (the scroll-film source) → use Wan image-to-video. Feed the Qwen Image keyframes as start/end frames. The keyframe images generated by Qwen Image serve as start/end frames for Wan.
-
-## Reference images
-Save the client reference(s) under ASCII names, e.g. `assets/ref-product.jpg` (and `assets/ref-detail.jpg`). Pass these to Qwen Image on every product-related generation to maintain identity.
-
-## Run in parallel
-Image generations are independent — launch multiple Qwen Image calls in parallel. Fan out: generate all keyframes first, then section stills, then cutouts. Video generations (Wan) depend on keyframes being ready first — run them after all Qwen Image keyframes are done and verified.
-
-## Frame extraction (Python + OpenCV — no ffmpeg)
-After video clips land (from whatever video tool is used), extract one continuous sequence (drop the shared duplicate first frame of clips 2..N):
+### 2. Frame extraction (Python + OpenCV — no ffmpeg)
+After the four video clips land, extract one continuous sequence (dropping the shared duplicate first frame of clips 2..N to maintain seamless transitions):
 ```python
 import cv2, os, glob
 clips = ["v1.mp4","v2.mp4","v3.mp4","v4.mp4"]; out="assets/seq"; os.makedirs(out, exist_ok=True)
@@ -80,9 +59,12 @@ for ci, p in enumerate(clips):
     cap.release()
 print("frames:", idx)   # set FRAME_COUNT in the HTML to this number
 ```
-(4 clips × 24, dropping 3 duplicates = **93** frames. Keep the HTML's `FRAME_COUNT` in sync with the real count.)
+*(4 clips × 24, dropping 3 duplicates = **93** frames. Keep the HTML's `FRAME_COUNT` in sync with this actual count.)*
 
-## Web-optimize before shipping
-Generated stills can be large. Downscale display images to ~2000–2600px JPEG q≈87 (cv2) so the page stays fast. Keep full-res keyframes only as video sources. Videos load lazily (CTA only), but consider their weight.
+### 3. Web-optimize before shipping
+Generated stills can be large (6–10 MB). Downscale display images to ~2000–2600px JPEG q≈87 (cv2) so the page stays fast. Keep full-res keyframes only as video sources.
+Use `scripts/optimize_assets.py` to downscale cutouts and logos.
 
-See [03-seamless-transitions](03-seamless-transitions.md) for boundary-matching and [07-modesty-and-identity](07-modesty-and-identity.md) for the two hard prompt constraints.
+---
+
+See [03-seamless-transitions.md](03-seamless-transitions.md) for boundary-matching and [07-modesty-and-identity.md](07-modesty-and-identity.md) for modesty rules.

@@ -1,5 +1,28 @@
 # Cinematic Landing Kit
 
+<div dir="rtl" align="right">
+
+## 🇸🇦 دعم اللغة العربية
+
+هذا النظام مصمم بدعم كامل للغة العربية منذ البداية — ليس مجرد ترجمة، بل هيكل بصري وتقني يراعي اتجاه الكتابة (RTL)، والطباعة العربية، والهوية الثقافية. كل قالب يدعم `dir="rtl"` و `lang="ar"` تلقائياً عبر ملف `brand.json`، مع خطوط عربية احترافية (El Messiri للعناوين + Tajawal للنص) بدلاً من الخطوط الافتراضية التي تفسد المظهر الفاخر.
+
+### ✨ أبرز المزايا
+
+- **ملف HTML واحد** — لا يحتاج إلى أي أدوات بناء أو تبعيات. فقط افتح الملف في المتصفح
+- **تجربة سينمائية** — صفحات هبوط بأسلوب Apple × Cartier مع فيلم منتج يُعرض بالتمرير
+- **٥ قوالب جاهزة** — `fullbleed` · `editorial` · `spatial` · `interface` · `minimal` لتغطية ١٥ حالة استخدام
+- **٣ مزودين للوسائط** — Nano Banana (افتراضي) · Qwen/Wan · Higgsfield CLI يمكنك اختيار الانسب حسب رغبتك
+- **هوية العلامة التجارية** — ملف `brand.json` يتحكم بكل شيء: الألوان، الخطوط، النبرة، الشعار، والتوطين
+- **يعمل مع أي وكيل ذكاء اصطناعي** — Claude Code, Cursor, Codex, Gemini CLI, Antigravity وغيرهم
+- **اضافة الضوابط** — يمكنك اضافة وتحديث اي ضوابط إلزامية يتم مراعاتها فى مخرجات التصميم والمحتوى 
+- **أدوات مساعدة اختيارية** — سكربتات Python لمعالجة الصور وإزالة الخلفيات واستخراج الإطارات
+
+> 📖 للاطلاع على التوثيق الكامل باللغة العربية: **[README بالعربية](README.ar.md)**
+
+</div>
+
+---
+
 A context-and-memory package that instructs **any AI coding agent** to produce
 scroll-driven, cinematic product landing pages — the kind that feel like a
 luxury TV ad, not a website.  One HTML file, CDN libraries, zero build step.
@@ -40,7 +63,7 @@ product films using production-tested patterns instead of generic templates.
 | ❌ `mix-blend-mode` glitches under GSAP | ✅ Transparent PNG cutouts |
 | ❌ Broken transitions (cross-dissolve ghosting) | ✅ Boundary-matched Wan clips |
 | ❌ Random typography (Amiri, system fonts) | ✅ El Messiri + Tajawal + Cormorant |
-| ❌ Inconsistent or placeholder assets | ✅ Qwen Image + Wan + rembg pipeline |
+| ❌ Inconsistent or placeholder assets | ✅ Multi-provider pipeline (Qwen/Wan, Higgsfield, Nano Banana) |
 | ❌ Hidden-tab `requestAnimationFrame` mystery | ✅ `eval`-based verification workflow |
 
 ### Traditional vs. Cinematic
@@ -52,7 +75,7 @@ product films using production-tested patterns instead of generic templates.
 | **Scroll** | Passive, just reveals content | Directed, cinematic motion |
 | **Feel** | Static page, fades on scroll | Continuous narrative journey |
 | **Result** | Generic, looks like every other site | Luxury — Apple x Cartier aesthetic |
-| **Assets** | Stock photos, placeholder gradients | AI-generated (Qwen/Wan) + rembg cutouts |
+| **Assets** | Stock photos, placeholder gradients | AI-generated (provider choice) + rembg cutouts |
 | **Build** | Framework + bundler + dependencies | Single HTML file, CDN only, zero build |
 
 ---
@@ -68,7 +91,8 @@ cp -r AGENTS.md memory/ templates/ scripts/   /path/to/your-project/
   Reference photos are in assets/. Follow AGENTS.md."
 
 # 3 — Preview:
-npx -y serve -l 8123 .
+python -m http.server 8123
+# Or open index.html directly in the browser
 ```
 
 That's it. The agent reads `AGENTS.md`, follows the build order, and produces a
@@ -87,7 +111,10 @@ working `index.html` on the first attempt.
 │   ├── 03-seamless-transitions.md       boundary-matched video clips
 │   ├── 04-cinematic-hero.md             hero entrance, tilt, sheen, cutout
 │   ├── 05-theming.md                    light/dark themes, the blend-mode trap
-│   ├── 06-media-pipeline.md             Qwen Image + Wan API, frame extraction
+│   ├── 06-media-pipeline.md             ★ provider selection + shared pipeline
+│   ├── 06-media-pipeline-qwen.md        Qwen Image + Wan (DashScope API)
+│   ├── 06-media-pipeline-higgsfield.md  Higgsfield CLI
+│   ├── 06-media-pipeline-nanobanana.md  Nano Banana (generate_image)
 │   ├── 07-modesty-and-identity.md       non-negotiable constraints on people/products
 │   ├── 08-preview-and-env-gotchas.md    hidden-tab quirks, eval-based verification
 │   ├── 09-quality-bar.md                what gets auto-rejected
@@ -99,9 +126,10 @@ working `index.html` on the first attempt.
 │   │   ├── editorial.html                split-screen hero + shorter film (2,8,13)
 │   │   ├── spatial.html                  establishing-shot hero + walkthrough film (4,10)
 │   │   ├── interface.html                device mockup hero + UI-flow film (6)
-│   │   ├── minimal.html                  centered hero, no canvas film (5)
-│   │   └── README.md                     decision tree: which template for which product
-│   ├── MEDIA-PROMPTS.template.md      ← numbered prompt list + per-use-case beat variants
+│   │   └── minimal.html                  centered hero, no canvas film (5)
+│   ├── MEDIA-PROMPTS-higgsfield.template.md   ← Higgsfield prompt list
+│   ├── MEDIA-PROMPTS-nanobanana.template.md   ← Nano Banana prompt list
+│   ├── MEDIA-PROMPTS-qwen.template.md         ← Qwen/Wan prompt list
 │   └── launch.json                    ← preview-server config
 └── scripts/                          ← Python helpers (no ffmpeg/jq required)
     ├── remove_backgrounds.py            rembg → transparent cutouts
@@ -117,16 +145,20 @@ working `index.html` on the first attempt.
 
 ## Requirements
 
-| Tool | Why | Install |
-|------|-----|---------|
-| Node.js | `npx serve` for preview | Any modern version |
-| Python 3.8+ | asset pipeline scripts | Any 3.8+ |
+The landing page itself has **zero requirements** — it is a single-file, zero-build HTML page that can be opened directly in any modern web browser or served using any static web server (e.g. `python -m http.server 8123`).
+
+The Python dependencies and CLI tools are **fully optional helpers** used for generating, extracting, or optimizing the media assets:
+
+| Tool / Package | Why | Install |
+|---|---|---|
+| Python 3.8+ | running helper scripts | Any 3.8+ |
 | `rembg` | transparent cutouts | `pip install rembg` |
 | `Pillow` | image resize/convert | `pip install Pillow` |
-| `opencv-python` | frame extraction (replaces ffmpeg) | `pip install opencv-python` |
-| `dashscope` *(optional)* | Qwen Image + Wan API calls | `pip install dashscope` |
+| `opencv-python` | frame extraction | `pip install opencv-python` |
+| `dashscope` *(opt)* | Qwen/Wan API calls | `pip install dashscope` |
+| `higgsfield` CLI *(opt)* | Higgsfield media generation | `higgsfield auth login` |
 
-One-shot install:
+One-shot helper scripts install:
 
 ```bash
 pip install rembg Pillow opencv-python dashscope
@@ -147,9 +179,7 @@ The output is a **single `index.html`** — no build, no bundler, no framework.
 | Film | `<canvas>` + JPG frame sequence | local assets |
 | Hero cutout | transparent PNG (rembg) | local assets |
 
-Visual assets are generated via **Qwen Image** (stills) and **Wan** (video
-clips) — typically through DashScope or Alibaba Cloud Bailian. Any model that
-supports image-to-image and image-to-video can substitute.
+Visual assets are generated via your chosen provider: **Nano Banana** (`generate_image` tool), **Qwen Image + Wan** (DashScope API), or **Higgsfield CLI**. Any equivalent model or setup can substitute.
 
 ---
 
@@ -249,7 +279,8 @@ typically get wrong on the first attempt without guidance:
   templates/layouts/*.html  ←  scaffold, fill placeholders
             │
             ▼
-  Qwen Image keyframes  →  Wan video clips
+   Keyframe images      →  Video clips
+   (chosen provider)       (chosen provider)
             │                    │
             └──────┬─────────────┘
                    ▼
@@ -260,7 +291,7 @@ typically get wrong on the first attempt without guidance:
         rembg → hero cutout (not needed for spatial/interface)
                    │
                    ▼
-             index.html  (served via npx serve)
+              index.html  (opened or served locally)
 ```
 
 ---
@@ -268,7 +299,7 @@ typically get wrong on the first attempt without guidance:
 ## Preview
 
 ```bash
-npx -y serve -l 8123 .
+python -m http.server 8123
 ```
 
 Open `http://localhost:8123` in a **visible** browser tab. Hidden or

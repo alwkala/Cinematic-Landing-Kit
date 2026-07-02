@@ -11,6 +11,7 @@
 5. Fill `{{PLACEHOLDER}}`s using `meta.*` + `voice.*` rules.
 6. Wire asset paths from `identity.*`.
 7. Set `html[lang]` and `html[dir]` from `localization.*`.
+8. Read `mediaProvider` to determine prompt template and media generation guidelines.
 
 ## Token → CSS variable mapping
 
@@ -134,6 +135,24 @@ Every string the agent writes into a `{{PLACEHOLDER}}` must follow `voice.*`:
 | `<meta name="twitter:card">` | `"summary_large_image"` if `ogImage` exists | |
 
 Asset paths use the `/assets/` prefix as declared; adjust if the kit is served from a subpath.
+
+## Media Provider Configuration
+
+The `mediaProvider` token determines which model pipeline and prompts template the agent will use when generating assets. If not specified, the system defaults to `nanobanana`.
+
+| `mediaProvider` value | Target Prompts Template | Target Pipeline Reference |
+|-----------------------|-------------------------|---------------------------|
+| `"nanobanana"` (default)| `templates/MEDIA-PROMPTS-nanobanana.template.md` | `memory/06-media-pipeline-nanobanana.md` |
+| `"qwen"` | `templates/MEDIA-PROMPTS-qwen.template.md` | `memory/06-media-pipeline-qwen.md` |
+| `"higgsfield"` | `templates/MEDIA-PROMPTS-higgsfield.template.md` | `memory/06-media-pipeline-higgsfield.md` |
+
+### brand.json Schema Extension
+
+```json
+{
+  "mediaProvider": "nanobanana"
+}
+```
 
 ## Localization
 

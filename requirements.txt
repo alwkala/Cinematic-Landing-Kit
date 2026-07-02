@@ -11,3 +11,7 @@ opencv-python>=4.7
 # Optional: Qwen Image + Wan API for generating stills and video clips
 # Uncomment or install separately if you need the AI-generation pipeline:
 # dashscope>=1.10
+
+# Optional: Higgsfield CLI for image and video generation
+# Install separately: see https://higgsfield.ai/docs
+# higgsfield CLI (auth via `higgsfield auth login`)

@@ -31,7 +31,7 @@ If all three pass → cinematic kit is the right choice.
 **Sections:** Hero → Film (raw→formed→branded→gallery) → Product reveal (specs grid) → Ritual/lifestyle → CTA (video + order)  
 **Hero:** Product cutout with aura + motes + 3D tilt + sheen  
 **Film beats:** Raw material → forming/assembly → brand mark appears → final product → gallery reveal  
-**Media:** Qwen Image keyframes with ref product photo; Wan clips boundary-matched; rembg on cleanest hero shot  
+**Media:** Generated keyframe images with ref product photo; boundary-matched video clips; rembg on cleanest hero shot  
 **Ambient palette:** Match product. Warm neutrals for food/beauty; cool grays for tech; deep tones for luxury  
 **Gotcha:** The transformation must be visually dramatic. If the raw→finished difference is subtle, skip the film → use editorial layout instead.
 
@@ -58,7 +58,7 @@ If all three pass → cinematic kit is the right choice.
 **Sections:** Hero (establishing exterior) → Film (approach→entry→rooms→view) → Space details (dimensions, materials) → Neighborhood/location → CTA (tour booking)  
 **Hero:** Wide architectural shot, NO product cutout. Full-bleed image with overlay text.  
 **Film beats:** Approach/exterior → threshold/entry → key interior space → signature view/detail  
-**Media:** Qwen Image for architectural keyframes (no ref needed — describe the space). Wan for walkthrough clips. No rembg needed.  
+**Media:** Generated architectural keyframe images (no ref needed — describe the space); walkthrough video clips. No rembg needed.  
 **Ambient palette:** Match architecture style — warm stone for Mediterranean, cool concrete for modernist, lush greens for tropical  
 **Gotcha:** Spatial films need consistent camera movement (walk/dolly). No orbits or product-style rotations. The viewer is walking through, not looking at.
 
@@ -67,7 +67,7 @@ If all three pass → cinematic kit is the right choice.
 **Sections:** Hero (portrait cutout, centered) → Statement (large quote) → About (two-column: story + portrait) → Work/Portfolio (grid) → CTA (connect/hire)  
 **Hero:** Person cutout (modesty rules apply), centered, no aura. Clean and minimal.  
 **Film:** None — section-based scroll reveals.  
-**Media:** Qwen Image for lifestyle/editorial portraits. rembg for hero cutout. Photography-style prompts, not product-style.  
+**Media:** Generated lifestyle/editorial portraits; rembg for hero cutout. Photography-style prompts, not product-style.  
 **Ambient palette:** Warm, approachable. Cream/paper tones. Gold accent for personal touch.  
 **Gotcha:** People pages must feel human, not corporate. Avoid dramatic cinematic effects — the minimal layout's restraint IS the premium signal.
 
@@ -76,7 +76,7 @@ If all three pass → cinematic kit is the right choice.
 **Sections:** Hero (device mockup) → Film (problem→UI flow→result) → Feature highlights (icon + text grid) → Integration/social proof → CTA (signup)  
 **Hero:** Device frame (laptop or phone) with UI screenshot inside. Subtle float + tilt.  
 **Film beats:** Problem state (empty/frustrating) → the app interface appears → key workflow in action → delighted result  
-**Media:** Qwen Image for UI mockups on device screens. Wan for UI interaction clips. Clean, modern prompts — not cinematic/luxury.  
+**Media:** Generated UI mockups on device screens; UI interaction video clips. Clean, modern prompts — not cinematic/luxury.  
 **Ambient palette:** Tech-forward — cool blues/purples, or match the app's brand colors. Dark theme common.  
 **Gotcha:** UI films must show ACTUAL interaction, not abstract transformations. Each frame should be a recognizable screen state. Use device frames consistently.
 
@@ -253,7 +253,7 @@ When switching fonts, update the Google Fonts link in the `<head>` and the `font
 
 ## Asset count estimates
 
-| Use case | Qwen Image stills | Wan clips | rembg cutouts | Total assets |
+| Use case | Generated stills | Video clips | rembg cutouts | Total assets |
 |----------|-------------------|-----------|---------------|-------------|
 | 1 · Product launch | 8–12 | 4–5 | 1–2 | 13–19 |
 | 2 · Brand story | 6–10 | 4 | 1 | 11–15 |

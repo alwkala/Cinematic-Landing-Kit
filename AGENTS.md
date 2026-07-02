@@ -1,6 +1,6 @@
 # AGENTS.md — Cinematic Luxury Landing-Page Engine
 
-Build a **single-file, scroll-driven luxury landing page** (Apple × Cartier aesthetic) for any product using Qwen Image (stills) + Wan (video clips). This is a single-file web app (`index.html`) with CDN libraries (GSAP, Lenis, Tailwind) — no build step, no framework, no bundler.
+Build a **single-file, scroll-driven luxury landing page** (Apple × Cartier aesthetic) for any product using a choice of media provider — default to Nano Banana (`generate_image` tool) or choose Qwen Image (stills) + Wan (video clips) / Higgsfield CLI if configured. This is a single-file web app (`index.html`) with CDN libraries (GSAP, Lenis, Tailwind) — no build step, no framework, no bundler.
 
 ## Critical architecture (the #1 thing)
 
@@ -23,8 +23,12 @@ The product "film" is a **JPG frame-sequence drawn on `<canvas>`**, scrubbed by 
    - Wire `<meta>` tags, favicon, and header logo from `meta.*` and `identity.*`.
    - Fill every `{{PLACEHOLDER}}` (copy, CTAs, captions) using `voice.*` rules — in particular, never use any word from `voice.doNotUse`, and always write in the voice's `preferredPerson`.
    - The engine is correct — override tokens + fill placeholders, don't rewrite the architecture.
-4. **Write the prompt list** from `templates/MEDIA-PROMPTS.template.md` (numbered, boundary-matched, identity + modesty clauses). Apply `voice.tone` and `voice.doNotUse` to any generated caption text. Skip the film-section prompts if building from `minimal.html`.
-5. **Generate assets** (see `memory/06-media-pipeline.md`): Qwen Image keyframes in parallel → Wan boundary-matched video clips (after keyframes verified) → extract frames → transparent hero cutout via `rembg`. Source product identity from `identity.logo.*` and `meta.product` to preserve brand accuracy.
+4. **Write the prompt list** from the appropriate media prompts template based on `mediaProvider` in `brand.json` (or default to Nano Banana if not specified):
+   - `templates/MEDIA-PROMPTS-nanobanana.template.md` — Nano Banana (default, uses built-in `generate_image` tool)
+   - `templates/MEDIA-PROMPTS-qwen.template.md` — Qwen Image + Wan (DashScope API)
+   - `templates/MEDIA-PROMPTS-higgsfield.template.md` — Higgsfield CLI
+   Ensure prompts are numbered, boundary-matched, and include identity + modesty clauses. Apply `voice.tone` and `voice.doNotUse` to any generated caption text. Skip the film-section prompts if building from `minimal.html`.
+5. **Generate assets** (see `memory/06-media-pipeline.md` for selection and the provider-specific guide): keyframe images in parallel → boundary-matched video clips (after keyframes verified) → extract frames → transparent hero cutout via `rembg`. Source product identity from `identity.logo.*` and `meta.product` to preserve brand accuracy.
 6. **Sync `FRAME_COUNT`** in `index.html` to the actual extracted frame count (4 clips × 24 frames − 3 duplicates = 93 is typical). Applies to `fullbleed`, `editorial`, `spatial`, and `interface` templates (not `minimal`).
 7. **Preview locally & verify** (see "Preview & verification" below). Run the brand.json verification checklist from `memory/11-brand-json.md` (no hardcoded hex values, contrast passes, voice compliance, etc.) in addition to the cinematic verification. Web-optimize heavy assets via `scripts/optimize_assets.py`.
 
@@ -41,7 +45,7 @@ The product "film" is a **JPG frame-sequence drawn on `<canvas>`**, scrubbed by 
 
 ## Preview & verification
 
-Serve: `npx -y serve -l 8123 .`
+Serve: `python -m http.server 8123` or open `index.html` directly in the browser.
 
 **Hidden browser tabs pause `requestAnimationFrame`** — GSAP tweens freeze, screenshots time out, bulk image preloads stall. This is the OS, not a bug. Verify via:
 - `eval` in the preview: check DOM structure, `getComputedStyle`, console errors.
@@ -51,7 +55,11 @@ Serve: `npx -y serve -l 8123 .`
 
 ## Asset pipeline (Python)
 
-**Dependencies:** `pip install rembg pillow opencv-python dashscope`
+**Dependencies vary by provider:**
+- **All providers:** `pip install rembg pillow opencv-python`
+- **Qwen/Wan:** + `pip install dashscope`
+- **Higgsfield:** + `higgsfield` CLI (auth via `higgsfield auth login`)
+- **Nano Banana:** no extra deps (uses built-in `generate_image` tool)
 
 | Script | Purpose |
 |--------|---------|
@@ -74,7 +82,10 @@ The frame extraction recipe (no ffmpeg needed) is in `memory/06-media-pipeline.m
 - `memory/02-scroll-film-canvas.md` — the canvas frame-sequence technique in detail
 - `memory/04-cinematic-hero.md` — the blend-mode trap; entrance + aura + particles + 3D tilt + sheen
 - `memory/05-theming.md` — light vs dark multiply/screen
-- `memory/06-media-pipeline.md` — Qwen Image + Wan API patterns, frame extraction code, parallel generation
+- `memory/06-media-pipeline.md` — provider selection guide + shared pipeline (frame extraction, optimization)
+- `memory/06-media-pipeline-qwen.md` — Qwen Image + Wan via DashScope API
+- `memory/06-media-pipeline-higgsfield.md` — Higgsfield CLI (nano_banana_2 + seedance_2_0)
+- `memory/06-media-pipeline-nanobanana.md` — Nano Banana via generate_image tool
 - `memory/08-preview-and-env-gotchas.md` — all the env quirks above, with full explanations
 - `memory/09-quality-bar.md` — the auto-reject checklist (what gets thrown out)
 - `memory/10-use-cases.md` — use-case routing: which layout, which sections, which media prompts for all 15 use cases

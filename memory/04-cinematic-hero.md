@@ -3,7 +3,7 @@
 The top of the page decides everything. **A static image + a fade-in is NOT acceptable** — it reads as "just another website" and will be rejected hard. The hero must feel alive and flow into the film below (one journey).
 
 ## Use a transparent product cutout, not a blend trick
-Drop the product onto the page as a **background-removed transparent PNG** (Python `rembg` + `Pillow` — see [06-nano-banana-pipeline](06-nano-banana-pipeline.md)) and composite it normally with a soft `drop-shadow`. Do NOT rely on `mix-blend-mode` for the hero — see the critical caveat in [05-theming](05-theming.md) (multiply/screen **break** on any element GSAP transforms → an ugly white/black box). A cutout is bulletproof on any background.
+Drop the product onto the page as a **background-removed transparent PNG** (Python `rembg` + `Pillow` — see [06-media-pipeline](06-media-pipeline.md)) and composite it normally with a soft `drop-shadow`. Do NOT rely on `mix-blend-mode` for the hero — see the critical caveat in [05-theming](05-theming.md) (multiply/screen **break** on any element GSAP transforms → an ugly white/black box). A cutout is bulletproof on any background.
 
 ## The recipe (layers + motion)
 Structure (nested wrappers so each owns ONE transform channel — no conflicts):

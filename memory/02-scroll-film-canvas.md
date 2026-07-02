@@ -9,7 +9,7 @@ The single most important technique. The hero transformation must read as one co
 Convert the video(s) into a **numbered JPG frame sequence** and draw the current frame onto a `<canvas>` based on scroll progress. Pre-decoded image swaps = zero seek lag.
 
 ## Recipe
-1. **Extract frames** from the source clip(s) — sample ~24–30 frames/clip, resize to ~1280px wide, JPEG q≈80. Concatenate clips into one continuous `f000.jpg … fNNN.jpg`. ~90–120 frames ≈ 5–8 MB total → preloads fine. (No ffmpeg needed; use Python + OpenCV — see [06-nano-banana-pipeline](06-nano-banana-pipeline.md).)
+1. **Extract frames** from the source clip(s) — sample ~24–30 frames/clip, resize to ~1280px wide, JPEG q≈80. Concatenate clips into one continuous `f000.jpg … fNNN.jpg`. ~90–120 frames ≈ 5–8 MB total → preloads fine. (No ffmpeg needed; use Python + OpenCV — see [06-media-pipeline](06-media-pipeline.md).)
 2. **Preload** all frames into `Image[]`; show a % preloader; promote to "ready" at ~60% loaded OR all-settled, with a **safety timeout** (~9s) so a stalled frame can't hang the page. If 0 load → show a static fallback still.
 3. **Scrub** with one ScrollTrigger:
    ```js

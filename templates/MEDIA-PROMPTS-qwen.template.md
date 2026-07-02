@@ -1,4 +1,4 @@
-# Media Prompt List — TEMPLATE (Qwen Image + Wan)
+# Media Prompt List — Qwen Image + Wan
 
 Fill in `{{PRODUCT}}`, `{{BRAND_MARK}}`, `{{ORIGIN}}`, the palette/edge color, and the story beats.
 Numbered by order of appearance. Stills generated via **Qwen Image**, video clips via **Wan**.

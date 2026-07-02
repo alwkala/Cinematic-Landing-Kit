@@ -3,11 +3,11 @@
 Hard-won quirks that otherwise waste hours. (Windows-flavored, but most apply anywhere.)
 
 ## Missing CLI tools — use substitutes
-- No **`jq`** → parse JSON with `grep -oE` if needed (see [06-nano-banana-pipeline](06-nano-banana-pipeline.md)).
+- No **`jq`** → parse JSON with `grep -oE` if needed (see [06-media-pipeline-higgsfield](06-media-pipeline-higgsfield.md)).
 - No **`ffmpeg`/`ffprobe`** → use **Python + OpenCV** (`cv2`) to read videos, get frame count/fps, extract & resize frames. Guard against `fps==0` / unreadable files (a failed download = a missing or 0-frame mp4).
 
 ## Serving the static file for preview
-Serve with `npx -y serve -l <port> .`. Some ports are OS-reserved — use e.g. 8123 with `autoPort:true`. The dev server tool reads a `launch.json` (see `templates/launch.json`).
+Serve with `python -m http.server 8123` or open `index.html` directly in the browser. The dev server configuration is in `templates/launch.json`.
 
 ## The headless preview tab is HIDDEN → rAF is PAUSED
 This is the big one. In a backgrounded preview tab `document.hidden === true`, so `requestAnimationFrame` fires **0×**:
