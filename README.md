@@ -80,7 +80,8 @@ working `index.html` on the first attempt.
 
 ```
 ├── AGENTS.md                         ← entry point any agent reads automatically
-├── memory/                           ← 10 reference files (the "DNA" of the look)
+├── brand.json                        ← single source of truth for brand identity (colors, fonts, voice, assets)
+├── memory/                           ← 11 reference files (the "DNA" of the look)
 │   ├── 01-build-playbook.md             page structure, Lenis + GSAP motion stack
 │   ├── 02-scroll-film-canvas.md         ★ canvas frame-sequence technique
 │   ├── 03-seamless-transitions.md       boundary-matched video clips
@@ -90,7 +91,8 @@ working `index.html` on the first attempt.
 │   ├── 07-modesty-and-identity.md       non-negotiable constraints on people/products
 │   ├── 08-preview-and-env-gotchas.md    hidden-tab quirks, eval-based verification
 │   ├── 09-quality-bar.md                what gets auto-rejected
-│   └── 10-use-cases.md                  ★ use-case routing: 15 use cases → layout + beats + media
+│   ├── 10-use-cases.md                  ★ use-case routing: 15 use cases → layout + beats + media
+│   └── 11-brand-json.md                 ★ brand.json schema, CSS var mapping, voice/identity rules
 ├── templates/
 │   ├── layouts/                       ← choose one layout variant per project
 │   │   ├── fullbleed.html                long scroll film + aura hero (1,2,3,7,9,11,12,14,15)
@@ -169,11 +171,44 @@ Multi-product catalogs, spec comparison pages, and A/B-tested funnels → standa
 
 ---
 
+## brand.json — single source of truth
+
+Each project's brand identity lives in **`brand.json`** at the project root. When present, agents read it **before** scaffolding the template, and its tokens override all template defaults. The kit is fully brand-adaptive — change `primary` from gold to blue, and the entire cinematic experience recolors while keeping its motion architecture intact.
+
+### What it governs
+
+| Token group | Kit behavior |
+|-------------|--------------|
+| `meta.*` | Fills `{{PRODUCT}}`, `<title>`, `<meta description>`, OG tags |
+| `colors.light.*` / `colors.dark.*` | Maps to the template's `:root` CSS variables (`--paper`, `--ink`, `--gold`, etc.) |
+| `voice.*` | Governs every generated string — captions, CTAs, eyebrows. Words in `voice.doNotUse` are hard-blocked. |
+| `identity.logo.*` | Paths to favicon, nav logo, OG image — wired into HTML `<head>` and header |
+| `typography.families.*` | Heading and body fonts. Latin accent (`Cormorant Garamond`) stays unless overridden. |
+| `localization.*` | Sets `<html lang>` and `<html dir>` for RTL/LTR rendering |
+| `motion.*` | Easing curves and reduced-motion behavior |
+| `accessibility.*` | Focus-ring, touch-target, and alt-text policies |
+
+Full token → CSS variable mapping: `memory/11-brand-json.md`.
+
+### Why brand.json matters
+
+- **Reproducibility** — regenerate any landing page from the same brand.json and get pixel-identical results
+- **Cross-kit portability** — the same `brand.json` powers the Cinematic Landing Kit, Documentation Kit, and future kits (Dashboard, Admin, LMS, Commerce)
+- **No hardcoding** — agents are explicitly forbidden from inlining a hex value or font name that has a brand.json equivalent
+- **Voice consistency** — every caption, CTA, and eyebrow is written in the brand's register
+
+A minimal `brand.json` (under 50 lines) takes about 3 minutes to author and eliminates every "default warm-gold" AI landing page drift.
+
+---
+
 ## What the agent knows before it starts
 
 These are the hard-won lessons encoded in `memory/` — the things agents
 typically get wrong on the first attempt without guidance:
 
+- **Read `brand.json` first** when present — its colors, fonts, voice, and
+  identity files override every template default. Never hardcode a hex or
+  font name that has a brand.json equivalent.
 - **Never scrub `video.currentTime`** — the scroll "film" is a canvas frame
   sequence, not a video element. H.264 seeking stutters.
 - **Never use `mix-blend-mode`** on animated elements — it breaks under GSAP

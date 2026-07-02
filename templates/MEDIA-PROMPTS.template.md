@@ -5,14 +5,22 @@ Numbered by order of appearance. Stills generated via **Qwen Image**, video clip
 All assets land in `assets/` with the exact filenames the HTML expects.
 
 ## 0 · Setup
+- **Read `brand.json` at the project root first**, if it exists. It is the single source of truth for:
+  - `meta.product` → fill `{{PRODUCT}}`
+  - `meta.tagline` → use `voice.*` to write any generated captions/eyebrows/CTAs
+  - `voice.tone` + `voice.doNotUse` + `voice.preferredPerson` → govern every text string in the page (including film captions)
+  - `identity.logo.*` → paths for the nav logo, favicon, OG image; use the actual logo file if high-quality, don't re-generate
+  - `colors.light.*` or `colors.dark.*` → pick the theme-appropriate hex palette for keyframe backgrounds; never invent a new color
+  - `identity.socialPreview.ogImage` → reuse, don't generate a separate one unless the cinematic hero is specifically needed
 - Save the client reference(s) under ASCII names, e.g. `assets/ref-product.jpg` (and `assets/ref-detail.jpg`).
 - These paths will be passed as reference images to Qwen Image on every product-related generation.
 
 ### Shared spec (paste into every product keyframe prompt)
-- **Edge/background (theme-dependent, keep IDENTICAL across keyframes):**
-  - Light: `Clean seamless warm off-white #FBF8F2 fading to the same paper tone at every edge and corner, soft natural daylight, gentle soft shadow.`
-  - Dark: `Deep espresso near-black #0B0805 fading to pure black at every edge and corner, dramatic single warm raking light.`
-- **Identity:** `Keep the exact {{PRODUCT}} identity and the {{BRAND_MARK}} unchanged.` (And: keep the mark where it really lives — on packaging vs on the product.)
+- **Edge/background (theme-dependent, keep IDENTICAL across keyframes; derive from `colors.<theme>.background` + `colors.<theme>.surface`):**
+  - Light: `Clean seamless warm off-white <LIGHT_BKGD_HEX> fading to the same paper tone at every edge and corner, soft natural daylight, gentle soft shadow.`
+  - Dark: `Deep espresso near-black <DARK_BKGD_HEX> fading to pure black at every edge and corner, dramatic single warm raking light.`
+  - *(Replace `<LIGHT_BKGD_HEX>` with `colors.light.background` from brand.json, `<DARK_BKGD_HEX>` with `colors.dark.background` — e.g. `#FBF8F2` / `#0B0805` for the default palette.)*
+- **Identity:** `Keep the exact {{PRODUCT}} identity and the {{BRAND_MARK}} unchanged.` (And: keep the mark where it really lives — on packaging vs on the product.) Use the logo asset from `identity.logo.full`/`mark` as the canonical reference; do not re-generate the mark via Qwen Image.
 - **Always:** `editorial luxury, hyper-detailed, no extra text, no watermark.`
 
 ---

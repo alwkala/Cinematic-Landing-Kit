@@ -25,6 +25,21 @@
 <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js" integrity="sha256-eUny2Hql6qBbqmuoQ60u6ueG2eCZVKQaGygqwCPquug=" crossorigin="anonymous"></script>
 
 <style>
+  /* TOKEN MAPPING — when brand.json is present, override :root variables below:
+     --paper=colors.<theme>.background  --ink=colors.<theme>.text
+     --mist=colors.<theme>.surface      --ink-soft=colors.<theme>.textMuted
+     --cream=colors.<theme>.surface2    --ink-faint=derive(textMuted, 40% opacity)
+     --gold=colors.primary (same both themes)
+     --gold-deep/dark=darken primary 15%  --gold-bright=lighten primary 12%
+     --accent=colors.secondary or colors.accent
+     --line/--line-soft=colors.<theme>.border at 30%/15% opacity
+     --maxw=breakpoints.xl  --ease=motion.easing.emphasized
+     Fonts: h1/h2/.display=typography.families.heading.primary
+            body/.sub/.lead=typography.families.body.primary
+            .latin/.eyebrow=keep Cormorant Garamond unless brand overrides display
+     html[lang]=localization.defaultLocale  html[dir]=localization.rtlLocales
+     Full reference: memory/11-brand-json.md
+     ============================================================================ */
   :root{
     --paper:#FBF8F2; --mist:#F7F4EC; --cream:#F3EEE2; --sand:#ECE2CF;
     --ink:#241812; --ink-soft:#6E5C4B; --ink-faint:#9A8975;

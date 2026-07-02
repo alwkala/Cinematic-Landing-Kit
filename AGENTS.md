@@ -9,18 +9,24 @@ The product "film" is a **JPG frame-sequence drawn on `<canvas>`**, scrubbed by 
 
 ## Build order
 
-1. **Decide direction** from the product + reference photos: theme (light/dark), story beats, palette. Don't ask the user to specify unless genuinely blocked.
+0. **Read brand identity source.** Check for `brand.json` at the project root (or wherever the host project declares its brand tokens). If it exists, read it once and treat it as the **single source of truth** for colors, fonts, voice, identity assets, and localization. It overrides all template defaults per the mapping in `memory/11-brand-json.md`. If no `brand.json` is found, fall back to each template's hardcoded defaults (warm gold + El Messiri/Tajawal palette).
+1. **Decide direction** from the product + reference photos + brand.json (if present): theme (light/dark — derived from `colors.light` vs `colors.dark` in brand.json), story beats, palette tokens, and voice register from `voice.tone`. Don't ask the user to specify unless genuinely blocked.
 2. **Choose a layout** from `templates/layouts/` — see the decision table there. Pick based on product type:
    - `fullbleed.html` — long scroll film, aura+motes hero (transformation stories: perfume, food, watches)
    - `editorial.html` — split-screen hero, shorter film, two-column sections (specs-heavy: furniture, auto, skincare)
    - `spatial.html` — establishing-shot hero, walkthrough film, experience/location sections (real estate, architecture, luxury travel, hospitality)
    - `interface.html` — device mockup hero, UI-flow film, feature/workflow sections (SaaS, apps, digital platforms)
    - `minimal.html` — centered hero, no canvas film, section-based (fast/lightweight: digital products, books)
-3. **Scaffold**: copy the chosen template to root as `index.html`, fill `{{PLACEHOLDERS}}`, wire sections/assets. The engine is correct — wire it, don't rewrite it.
-4. **Write the prompt list** from `templates/MEDIA-PROMPTS.template.md` (numbered, boundary-matched, identity + modesty clauses). Skip the film-section prompts if building from `minimal.html`.
-5. **Generate assets** (see `memory/06-media-pipeline.md`): Qwen Image keyframes in parallel → Wan boundary-matched video clips (after keyframes verified) → extract frames → transparent hero cutout via `rembg`.
+3. **Scaffold**: copy the chosen template to root as `index.html`, then:
+   - Override the template's `:root` CSS variables with brand.json tokens using the mapping table at the top of each layout's `<style>` section (or see `memory/11-brand-json.md` for the full reference).
+   - Set `<html lang>` and `<html dir>` from `localization.*`.
+   - Wire `<meta>` tags, favicon, and header logo from `meta.*` and `identity.*`.
+   - Fill every `{{PLACEHOLDER}}` (copy, CTAs, captions) using `voice.*` rules — in particular, never use any word from `voice.doNotUse`, and always write in the voice's `preferredPerson`.
+   - The engine is correct — override tokens + fill placeholders, don't rewrite the architecture.
+4. **Write the prompt list** from `templates/MEDIA-PROMPTS.template.md` (numbered, boundary-matched, identity + modesty clauses). Apply `voice.tone` and `voice.doNotUse` to any generated caption text. Skip the film-section prompts if building from `minimal.html`.
+5. **Generate assets** (see `memory/06-media-pipeline.md`): Qwen Image keyframes in parallel → Wan boundary-matched video clips (after keyframes verified) → extract frames → transparent hero cutout via `rembg`. Source product identity from `identity.logo.*` and `meta.product` to preserve brand accuracy.
 6. **Sync `FRAME_COUNT`** in `index.html` to the actual extracted frame count (4 clips × 24 frames − 3 duplicates = 93 is typical). Applies to `fullbleed`, `editorial`, `spatial`, and `interface` templates (not `minimal`).
-7. **Preview locally & verify** (see "Preview & verification" below). Web-optimize heavy assets via `scripts/optimize_assets.py`.
+7. **Preview locally & verify** (see "Preview & verification" below). Run the brand.json verification checklist from `memory/11-brand-json.md` (no hardcoded hex values, contrast passes, voice compliance, etc.) in addition to the cinematic verification. Web-optimize heavy assets via `scripts/optimize_assets.py`.
 
 ## Non-negotiables
 
@@ -31,6 +37,7 @@ The product "film" is a **JPG frame-sequence drawn on `<canvas>`**, scrubbed by 
 - **Typography**: Arabic = El Messiri (headings) + Tajawal (body). **Never Amiri**. Captions off-center (right in RTL).
 - **Modesty mandatory** for any person (full hijab, conservative). **Exact product identity** preserved across all assets.
 - **Graceful fallbacks**: `prefers-reduced-motion` + missing-asset gradient on a container (not `::after` on `<img>` — `::after` doesn't render on replaced elements).
+- **brand.json is authoritative** when present: colors, fonts, voice, identity assets, and localization all derive from it. Never hardcode a hex or font name in `index.html` when a `brand.json` token exists. If `brand.json` is absent, the template's defaults (warm gold + El Messiri/Tajawal) apply.
 
 ## Preview & verification
 
@@ -71,3 +78,4 @@ The frame extraction recipe (no ffmpeg needed) is in `memory/06-media-pipeline.m
 - `memory/08-preview-and-env-gotchas.md` — all the env quirks above, with full explanations
 - `memory/09-quality-bar.md` — the auto-reject checklist (what gets thrown out)
 - `memory/10-use-cases.md` — use-case routing: which layout, which sections, which media prompts for all 15 use cases
+- `memory/11-brand-json.md` — brand token schema, CSS variable → brand.json mapping, voice/identity/localization rules, verification checklist
