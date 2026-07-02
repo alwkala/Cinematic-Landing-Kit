@@ -8,8 +8,52 @@ luxury TV ad, not a website.  One HTML file, CDN libraries, zero build step.
 AI agent reads AGENTS.md  →  follows memory/  →  produces index.html  →  done.
 ```
 
-Works with Claude Code, Codex, Cursor, Kilo, Windsurf, Roo Code, and any agent
-that auto-reads project-level instruction files.
+Works with any AI coding agent that auto-reads project-level instruction files
+(`AGENTS.md`, `.cursorrules`, system prompts, etc.).
+
+### Compatible Agents
+
+| Agent | Agent | Agent |
+|-------|-------|-------|
+| **Claude Code** | **Codex** | **Cursor** |
+| **Kilo** | **Windsurf** | **Roo** |
+| **Continue** | **Cline** | **OpenCode** |
+| **Gemini CLI** | **OpenHands** | **Google Antigravity** |
+
+> Not seeing yours? If your agent can read `AGENTS.md` from the project root,
+> it works. Drop the kit into your project and prompt away.
+
+---
+
+## Why AI Agents Fail
+
+Most AI coding agents can generate a landing page.
+
+Very few can generate an Apple-style cinematic experience.
+
+Cinematic Landing Kit teaches any AI coding agent how to build scroll-driven
+product films using production-tested patterns instead of generic templates.
+
+| Without this kit | With this kit |
+|------------------|---------------|
+| ❌ Scrubs `video.currentTime` (stutter) | ✅ Canvas frame-sequence film |
+| ❌ `mix-blend-mode` glitches under GSAP | ✅ Transparent PNG cutouts |
+| ❌ Broken transitions (cross-dissolve ghosting) | ✅ Boundary-matched Wan clips |
+| ❌ Random typography (Amiri, system fonts) | ✅ El Messiri + Tajawal + Cormorant |
+| ❌ Inconsistent or placeholder assets | ✅ Qwen Image + Wan + rembg pipeline |
+| ❌ Hidden-tab `requestAnimationFrame` mystery | ✅ `eval`-based verification workflow |
+
+### Traditional vs. Cinematic
+
+| | Traditional Landing Page | Cinematic Landing Kit |
+|---|------------------------|----------------------|
+| **Hero** | Static image + fade-in | Scroll-driven storytelling |
+| **Motion** | CSS `opacity` transition | Canvas film scrubbed by scroll |
+| **Scroll** | Passive, just reveals content | Directed, cinematic motion |
+| **Feel** | Static page, fades on scroll | Continuous narrative journey |
+| **Result** | Generic, looks like every other site | Luxury — Apple x Cartier aesthetic |
+| **Assets** | Stock photos, placeholder gradients | AI-generated (Qwen/Wan) + rembg cutouts |
+| **Build** | Framework + bundler + dependencies | Single HTML file, CDN only, zero build |
 
 ---
 
@@ -199,12 +243,29 @@ full verification workflow.
 
 ---
 
+## Community Standards
+
+| Document | Purpose |
+|----------|---------|
+| [Code of Conduct](CODE_OF_CONDUCT.md) | Contributor Covenant v2.1 — expected behavior in all community spaces |
+| [Contributing Guide](CONTRIBUTING.md) | How to report bugs, add gotchas, propose layouts, and submit PRs |
+
 ## Contributing
 
 If you find a gotcha that isn't in `memory/` yet, add it. The value of this
 kit grows with every hard-won lesson captured here instead of forgotten.
 
+The highest-impact contributions are new pitfall entries in `memory/` files —
+each one saves the next person (and the next agent) from the same 30-minute
+debug loop. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide on
+submitting gotchas, layouts, media pipeline improvements, and pull requests.
+
 ## Credits
 
 Built from real production experience. Created by
 [alwkala](https://github.com/alwkala). Use freely.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
