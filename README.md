@@ -1,5 +1,23 @@
 # Cinematic Landing Kit
 
+A context-and-memory package that instructs **any AI coding agent** to produce
+scroll-driven, cinematic product landing pages — the kind that feel like a
+luxury TV ad, not a website.  One HTML file, CDN libraries, zero build step.
+
+```
+AI agent reads AGENTS.md  →  follows memory/  →  produces index.html  →  done.
+```
+
+<img align="right" width="180" src="https://github.com/alwkala/Cinematic-Landing-Kit/blob/main/CinematicLandingKit.jpg" alt="Cinematic-Landing-Kit"/>
+
+# Demo 
+check the output of the design-system-kit live on : 
+https://alwkala.com/demos/design-system-kit/
+
+<img align="right" width="180" src="https://github.com/alwkala/Cinematic-Landing-Kit/blob/main/screenshot-1.jpg" alt="Screenshot"/>
+
+<img align="right" width="180" src="https://github.com/alwkala/Cinematic-Landing-Kit/blob/main/screenshot-2.jpg" alt="Screenshot"/>
+
 <div dir="rtl" align="right">
 
 ## 🇸🇦 دعم اللغة العربية
@@ -22,14 +40,6 @@
 </div>
 
 ---
-
-A context-and-memory package that instructs **any AI coding agent** to produce
-scroll-driven, cinematic product landing pages — the kind that feel like a
-luxury TV ad, not a website.  One HTML file, CDN libraries, zero build step.
-
-```
-AI agent reads AGENTS.md  →  follows memory/  →  produces index.html  →  done.
-```
 
 Works with any AI coding agent that auto-reads project-level instruction files
 (`AGENTS.md`, `.cursorrules`, system prompts, etc.).
